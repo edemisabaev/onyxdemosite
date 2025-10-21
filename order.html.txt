@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма заказа</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0a0a23;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Звездный фон */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                circle at center,
+                rgba(255, 255, 255, 0.1) 0%,
+                transparent 70%
+            );
+            animation: twinkle 4s infinite;
+            z-index: -1;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -2;
+        }
+
+        .order-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        label {
+            font-size: 1.2rem;
+            text-align: left;
+        }
+
+        /* Кастомный select */
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+
+        .select-selected {
+            padding: 10px 30px 10px 15px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px;
+            background: #ffffff33;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .select-selected::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            width: 0;
+            height: 0;
+            border: 6px solid transparent;
+            border-top-color: white;
+            transform: translateY(-50%);
+        }
+
+        .select-selected:hover, .select-selected:focus {
+            background: #ffffff4d;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        .select-selected::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .select-selected:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .select-items {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #0a0a23;
+            border-radius: 15px;
+            margin-top: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .select-items.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .select-items div {
+            padding: 12px 15px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .select-items div:hover {
+            background: #ffffff1a;
+        }
+
+        /* Поле номера */
+        input {
+            padding: 10px 15px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px;
+            background: #ffffff33;
+            color: white;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        input:focus {
+            outline: none;
+            background: #ffffff4d;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        input:hover {
+            background: #ffffff4d;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        input::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        input:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            background: #ffffff33;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            background: #ffffff4d;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        button:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="stars"></canvas>
+    <div class="order-form">
+        <h2>Оформление заказа</h2>
+        <label for="country">Страна:</label>
+        <div class="custom-select">
+            <div class="select-selected">Выберите страну</div>
+            <div class="select-items">
+                <div data-value="russia">Россия</div>
+                <div data-value="belarus">Беларусь</div>
+                <div data-value="ukraine">Украина</div>
+                <div data-value="kazakhstan">Казахстан</div>
+                <div data-value="other">Другая</div>
+            </div>
+        </div>
+        <label for="phone">Номер телефона:</label>
+        <input type="tel" id="phone" name="phone" required>
+        <button type="submit">Отправить</button>
+    </div>
+
+    <script>
+        // Звездный фон
+        const canvas = document.getElementById('stars');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const stars = [];
+        for (let i = 0; i < 100; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2,
+                opacity: Math.random()
+            });
+        }
+
+        function animateStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+                ctx.fill();
+                star.opacity += (Math.random() - 0.5) * 0.05;
+                if (star.opacity > 1) star.opacity = 1;
+                if (star.opacity < 0) star.opacity = 0;
+            });
+            requestAnimationFrame(animateStars);
+        }
+
+        animateStars();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Кастомный select
+        const select = document.querySelector('.custom-select');
+        const selected = select.querySelector('.select-selected');
+        const items = select.querySelector('.select-items');
+        const options = items.querySelectorAll('div');
+
+        selected.addEventListener('click', () => {
+            items.classList.toggle('show');
+        });
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                selected.textContent = option.textContent;
+                items.classList.remove('show');
+            });
+        });
+
+        // Закрытие при клике вне
+        document.addEventListener('click', (e) => {
+            if (!select.contains(e.target)) {
+                items.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
